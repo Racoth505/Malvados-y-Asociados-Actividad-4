@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - STOCKO</title>
+  <link rel="stylesheet" href="../../css/dashboard.css">
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h1 class="logo">STOCKO</h1>
+
+    <nav class="menu">
+      <a href="#" class="menu-item active">
+        <img src="../../assets/images/home.png" alt="">
+        Inicio
+      </a>
+
+      <a href="../products/index.html" class="menu-item">
+        <img src="../../assets/images/products.png" alt="">
+        Productos
+      </a>
+    </nav>
+
+    <button id="logoutBtn" class="logout">
+      <img src="../../assets/images/log_out.png" alt="">
+      Cerrar Sesión
+    </button>
+  </aside>
+
+  <!-- CONTENIDO -->
+  <main class="main">
+    <div class="content-wrapper">
+
+      <header class="topbar">
+        <div class="user" id="userName"></div>
+      </header>
+
+      <!-- RESUMEN -->
+      <section class="summary">
+        <div class="card">
+          <h3>Total de Productos:</h3>
+          <p id="totalProductos">0</p>
+        </div>
+
+        <div class="card">
+          <h3>Valor Total:</h3>
+          <p id="valorTotal">$0</p>
+        </div>
+      </section>
+
+      <section class="charts">
+        <div class="card small">
+          <h3>Categoria con Mayor Productos:</h3>
+          <div class="content-row">
+            <div class="circle" id="graficaCantidad"></div>
+            <div id="categoriaCantidad" class="category-info"></div>
+          </div>
+        </div>
+
+        <div class="card small">
+          <h3>Categoria con Mayor Valor Economico:</h3>
+          <div class="content-row">
+            <div class="circle" id="graficaValor"></div>
+            <div id="categoriaValor" class="category-info"></div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- TABLAS -->
+      <section class="tables">
+
+        <div class="card small">
+          <h3>Productos por caducar pronto:</h3>
+          <table id="tablaCaducados"></table>
+        </div>
+
+        <div class="card small">
+          <h3>Productos con bajo stock:</h3>
+          <table id="tablaBajoStock"></table>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+<script src="../../js/dashboard.js"></script>
+</body>
+</html>

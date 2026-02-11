@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Productos - STOCKO</title>
+
+  <!-- Sidebar usa dashboard.css -->
+  <link rel="stylesheet" href="../../css/dashboard.css">
+  <link rel="stylesheet" href="../../css/products.css">
+</head>
+<body>
+
+<!-- SIDEBAR (IGUAL QUE DASHBOARD) -->
+<aside class="sidebar">
+  <h1 class="logo">STOCKO</h1>
+
+  <nav class="menu">
+    <a href="../dashboard/index.html" class="menu-item">
+      <img src="../../assets/images/home.png">
+      Inicio
+    </a>
+
+    <a href="#" class="menu-item active">
+      <img src="../../assets/images/products.png">
+      Productos
+    </a>
+  </nav>
+
+  <button id="logoutBtn" class="logout">
+    <img src="../../assets/images/log_out.png">
+    Cerrar Sesión
+  </button>
+</aside>
+
+<main class="main">
+  <div class="content-wrapper">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <input type="text" id="searchInput" placeholder="Buscar...">
+
+      <select id="filterCategoria">
+        <option value="todos">Todos</option>
+      </select>
+
+      <button id="btnAdd">+</button>
+    </header>
+
+    <!-- TABLA -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Stock</th>
+            <th>Precio</th>
+            <th>Categoria</th>
+            <th>Caducidad</th>
+          </tr>
+        </thead>
+        <tbody id="tablaProductos"></tbody>
+      </table>
+    </div>
+
+  </div>
+</main>
+
+<!-- MODAL -->
+<!-- MODAL -->
+<div id="modal" class="modal hidden">
+  <div class="modal-card">
+
+    <h2 id="modalTitle">Nuevo Producto</h2>
+
+    <input type="hidden" id="productoId">
+
+    <label>Nombre:</label>
+    <input id="nombre">
+
+    <div class="row">
+      <div>
+        <label>Cantidad:</label>
+        <input type="number" id="stock">
+      </div>
+
+      <div>
+        <label>Precio:</label>
+        <input type="number" id="precio">
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Categoria:</label>
+        <input id="categoria">
+      </div>
+
+      <div>
+        <label>Caducidad:</label>
+        <input type="date" id="fecha">
+      </div>
+    </div>
+
+    <div class="modal-buttons">
+      <button class="btn-cancel" id="cancelar">Cancelar</button>
+      <button class="btn-delete hidden" id="eliminarBtn">Eliminar</button>
+      <button class="btn-save" id="guardar">Guardar</button>
+    </div>
+
+  </div>
+</div>
+
+
+<script src="../../js/products.js"></script>
+</body>
+</html>

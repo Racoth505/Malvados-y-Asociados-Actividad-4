@@ -231,12 +231,14 @@ function renderCategoriasValor(productos) {
 
 function getColor(index) {
   const colores = [
-    "#8fb9e3",
-    "#7fbcc7",
-    "#f4a261",
-    "#e76f51",
-    "#90be6d",
-    "#c77dff"
+    "#00A6FB", // Azul electrico
+    "#FF2D55", // Fucsia rojo
+    "#39D353", // Verde neon
+    "#FFD60A", // Amarillo vivo
+    "#8B5CF6", // Violeta brillante
+    "#00E5A8", // Turquesa neon
+    "#FF6A00", // Naranja intenso
+    "#FF4FD8"  // Magenta vivo
   ];
   return colores[index % colores.length];
 }

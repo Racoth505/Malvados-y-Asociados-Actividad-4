@@ -109,6 +109,7 @@ function renderTabla(lista) {
       <tr onclick="editar(${p.id})">
         <td>${p.id}</td>
         <td>${p.nombre}</td>
+        <td>${p.medida}</td>
         <td>${p.stock}</td>
         <td>$${Number(p.precio).toFixed(2)}</td>
         <td>${p.categoria}</td>
@@ -163,6 +164,7 @@ function editar(id) {
 
   productoId.value = p.id;
   nombre.value = p.nombre ?? "";
+  medida.value = p.medida ?? "";
   stock.value = p.stock ?? "";
   precio.value = p.precio ?? "";
   categoria.value = p.categoria ?? "";
@@ -190,7 +192,7 @@ async function guardarProducto() {
   // Backend espera exactamente: nombre, medida, precio, stock, perecedero, fecha_caducidad, categoria
   const data = {
     nombre: String(nombre.value || "").trim(),
-    medida: "Unidad",
+    medida: String(medida.value || "").trim(),
     stock: Number(stock.value),
     precio: Number(precio.value),
     categoria: String(categoria.value || "").trim(),

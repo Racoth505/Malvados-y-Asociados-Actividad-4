@@ -87,17 +87,24 @@ function renderBajoStock(productos) {
 
 function renderCaducados(productos) {
 
-  const hoy = new Date().toISOString().split("T")[0];
+  // Normalizamos "hoy" a inicio del día para evitar problemas de zona horaria.
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
 
   const porCaducar = productos.filter(p => {
-    if (Number(p.perecedero) !== 1) return false;
-    if (!p.Fecha_caducidad) return false;
+    // En la API el campo viene como `fecha_caducidad` (alias en el SELECT)
+    // y `perecedero` puede venir como 0/1 o boolean.
+    const esPerecedero =
+      p.perecedero === true || Number(p.perecedero) === 1;
 
-    const fecha = p.Fecha_caducidad.split("T")[0];
+    const fechaCad = p.fecha_caducidad;
+    if (!esPerecedero || !fechaCad) return false;
 
-    const diff =
-      (new Date(fecha) - new Date(hoy)) / (1000 * 60 * 60 * 24);
+    const fechaStr = String(fechaCad).split("T")[0];
+    const fecha = new Date(`${fechaStr}T00:00:00`);
+    fecha.setHours(0, 0, 0, 0);
 
+    const diff = (fecha - hoy) / (1000 * 60 * 60 * 24);
     return diff <= 30 && diff >= 0;
   });
 
@@ -123,7 +130,7 @@ function renderCaducados(productos) {
     table.innerHTML += `
       <tr>
         <td>${p.nombre}</td>
-        <td>${p.Fecha_caducidad.split("T")[0]}</td>
+        <td>${String(p.fecha_caducidad).split("T")[0]}</td>
       </tr>
     `;
   });

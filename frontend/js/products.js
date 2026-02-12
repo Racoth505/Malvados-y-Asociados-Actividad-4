@@ -1,47 +1,108 @@
 const API = "http://localhost:3000/api/productos";
-const token = localStorage.getItem("token");
 
-if (!token) {
-  window.location.href = "../login/index.html";
+function getToken() {
+  return localStorage.getItem("token");
 }
 
+function authHeaders(extra = {}) {
+  const token = getToken();
+  return {
+    ...extra,
+    Authorization: `Bearer ${token}`
+  };
+}
+
+// =================== STATE ===================
 let productosGlobal = [];
 
+// =================== DOM ===================
+const modal = document.getElementById("modal");
+const modalTitle = document.getElementById("modalTitle");
+
+const productoId = document.getElementById("productoId");
+const nombre = document.getElementById("nombre");
+const stock = document.getElementById("stock");
+const precio = document.getElementById("precio");
+const categoria = document.getElementById("categoria");
+const fecha = document.getElementById("fecha");
+
+const tablaProductos = document.getElementById("tablaProductos");
+const searchInput = document.getElementById("searchInput");
+const filterCategoria = document.getElementById("filterCategoria");
+
+const btnAdd = document.getElementById("btnAdd");
+const cancelar = document.getElementById("cancelar");
+const guardar = document.getElementById("guardar");
+const eliminarBtn = document.getElementById("eliminarBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+
+// =================== INIT ===================
 document.addEventListener("DOMContentLoaded", () => {
-  cargarProductos();
+  const token = getToken();
+  if (!token) {
+    window.location.href = "../login/index.html";
+    return;
+  }
 
-  btnAdd.onclick = abrirNuevo;
-  cancelar.onclick = cerrarModal;
-  guardar.onclick = guardarProducto;
-  eliminar.onclick = eliminarProducto;
+  btnAdd.addEventListener("click", abrirNuevo);
+  cancelar.addEventListener("click", cerrarModal);
+  guardar.addEventListener("click", guardarProducto);
+  eliminarBtn.addEventListener("click", eliminarProducto);
 
-  searchInput.oninput = filtrar;
-  filterCategoria.onchange = filtrar;
+  searchInput.addEventListener("input", filtrar);
+  filterCategoria.addEventListener("change", filtrar);
 
-  logoutBtn.onclick = () => {
+  logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("token");
     window.location.href = "../login/index.html";
-  };
-});
-
-async function cargarProductos() {
-  const res = await fetch(API, {
-    headers: { Authorization: `Bearer ${token}` }
   });
 
-  productosGlobal = await res.json();
+  cargarProductos();
+});
 
-  renderTabla(productosGlobal);
-  cargarCategorias();
+// Exponemos editar() porque el <tr onclick="editar(id)"> lo requiere.
+window.editar = editar;
+
+// =================== API ===================
+async function cargarProductos() {
+  try {
+    const res = await fetch(API, { headers: authHeaders() });
+    if (!res.ok) {
+      const msg = await safeError(res);
+      throw new Error(msg || "No se pudo cargar productos");
+    }
+
+    productosGlobal = await res.json();
+    renderTabla(productosGlobal);
+    cargarCategorias();
+  } catch (e) {
+    console.error(e);
+    // Si el token expiró o es inválido, el backend responde 401
+    if (String(e.message).toLowerCase().includes("token") || String(e.message).toLowerCase().includes("no autorizado")) {
+      localStorage.removeItem("token");
+      window.location.href = "../login/index.html";
+    } else {
+      alert(e.message || "Error al cargar productos");
+    }
+  }
 }
 
+async function safeError(res) {
+  try {
+    const data = await res.json();
+    return data?.error;
+  } catch {
+    return null;
+  }
+}
+
+// =================== UI ===================
 function renderTabla(lista) {
   tablaProductos.innerHTML = "";
 
   lista.forEach(p => {
-
     const caducidad = p.fecha_caducidad
-      ? p.fecha_caducidad.split("T")[0]
+      ? String(p.fecha_caducidad).split("T")[0]
       : "No";
 
     tablaProductos.innerHTML += `
@@ -59,8 +120,7 @@ function renderTabla(lista) {
 
 function cargarCategorias() {
   filterCategoria.innerHTML = `<option value="todos">Todos</option>`;
-
-  const categorias = [...new Set(productosGlobal.map(p => p.categoria))];
+  const categorias = [...new Set(productosGlobal.map(p => p.categoria).filter(Boolean))];
 
   categorias.forEach(c => {
     filterCategoria.innerHTML += `<option value="${c}">${c}</option>`;
@@ -68,15 +128,19 @@ function cargarCategorias() {
 }
 
 function filtrar() {
-  const texto = searchInput.value.toLowerCase();
-  const categoria = filterCategoria.value;
+  const texto = (searchInput.value || "").toLowerCase().trim();
+  const cat = filterCategoria.value;
 
-  let filtrados = productosGlobal.filter(p =>
-    p.nombre.toLowerCase().includes(texto)
-  );
+  let filtrados = productosGlobal;
 
-  if (categoria !== "todos") {
-    filtrados = filtrados.filter(p => p.categoria === categoria);
+  if (texto) {
+    filtrados = filtrados.filter(p =>
+      String(p.nombre || "").toLowerCase().includes(texto)
+    );
+  }
+
+  if (cat && cat !== "todos") {
+    filtrados = filtrados.filter(p => p.categoria === cat);
   }
 
   renderTabla(filtrados);
@@ -85,25 +149,24 @@ function filtrar() {
 function abrirNuevo() {
   modalTitle.textContent = "Nuevo Producto";
   productoId.value = "";
-  eliminar.classList.add("hidden");
+  eliminarBtn.classList.add("hidden");
   limpiarCampos();
   modal.classList.remove("hidden");
 }
 
 function editar(id) {
-  const p = productosGlobal.find(x => x.id === id);
+  const p = productosGlobal.find(x => Number(x.id) === Number(id));
+  if (!p) return;
 
   modalTitle.textContent = "Editar Producto";
-  eliminar.classList.remove("hidden");
+  eliminarBtn.classList.remove("hidden");
 
   productoId.value = p.id;
-  nombre.value = p.nombre;
-  stock.value = p.stock;
-  precio.value = p.precio;
-  categoria.value = p.categoria;
-  fecha.value = p.fecha_caducidad
-    ? p.fecha_caducidad.split("T")[0]
-    : "";
+  nombre.value = p.nombre ?? "";
+  stock.value = p.stock ?? "";
+  precio.value = p.precio ?? "";
+  categoria.value = p.categoria ?? "";
+  fecha.value = p.fecha_caducidad ? String(p.fecha_caducidad).split("T")[0] : "";
 
   modal.classList.remove("hidden");
 }
@@ -120,50 +183,64 @@ function limpiarCampos() {
   fecha.value = "";
 }
 
+// =================== CRUD ===================
 async function guardarProducto() {
-
   const id = productoId.value;
 
+  // Backend espera exactamente: nombre, medida, precio, stock, perecedero, fecha_caducidad, categoria
   const data = {
-    nombre: nombre.value,
+    nombre: String(nombre.value || "").trim(),
     medida: "Unidad",
     stock: Number(stock.value),
     precio: Number(precio.value),
-    Categoria: categoria.value, // 👈 IMPORTANTE mayúscula
-    perecedero: fecha.value ? true : false,
-    Fecha_caducidad: fecha.value || null
+    categoria: String(categoria.value || "").trim(),
+    perecedero: Boolean(fecha.value),
+    fecha_caducidad: fecha.value ? fecha.value : null
   };
 
   const metodo = id ? "PUT" : "POST";
   const url = id ? `${API}/${id}` : API;
 
-  const res = await fetch(url, {
-    method: metodo,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(data)
-  });
+  try {
+    const res = await fetch(url, {
+      method: metodo,
+      headers: authHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify(data)
+    });
 
-  if (!res.ok) {
-    console.error("Error al guardar");
-    return;
+    if (!res.ok) {
+      const msg = await safeError(res);
+      throw new Error(msg || "Error al guardar");
+    }
+
+    cerrarModal();
+    await cargarProductos();
+  } catch (e) {
+    console.error(e);
+    alert(e.message || "Error al guardar");
   }
-
-  cerrarModal();
-  cargarProductos();
 }
 
-
 async function eliminarProducto() {
+  const id = productoId.value;
+  if (!id) return;
   if (!confirm("¿Eliminar producto?")) return;
 
-  await fetch(`${API}/${productoId.value}`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  try {
+    const res = await fetch(`${API}/${id}`, {
+      method: "DELETE",
+      headers: authHeaders()
+    });
 
-  cerrarModal();
-  cargarProductos();
+    if (!res.ok) {
+      const msg = await safeError(res);
+      throw new Error(msg || "Error al eliminar");
+    }
+
+    cerrarModal();
+    await cargarProductos();
+  } catch (e) {
+    console.error(e);
+    alert(e.message || "Error al eliminar");
+  }
 }

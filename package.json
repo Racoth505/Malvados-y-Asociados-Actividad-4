@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
-    "backend": "npm run dev --prefix backend",
+    "backend": "npm run dev --prefix Backend",
     "frontend": "live-server frontend --port=5500 --open=/pages/login/index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/Racoth505/Malvados-y-Asociados-Actividad-4#readme",
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "live-server": "^1.2.2"
   }
 }

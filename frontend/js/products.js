@@ -1,4 +1,5 @@
-const API = "http://localhost:3000/api/productos";
+const API_BASE = window.APP_CONFIG?.API_BASE_URL || "http://localhost:3000/api";
+const API = `${API_BASE}/productos`;
 
 function getToken() {
   return localStorage.getItem("token");
@@ -107,7 +108,6 @@ function renderTabla(lista) {
 
     tablaProductos.innerHTML += `
       <tr onclick="editar(${p.id})">
-        <td>${p.id}</td>
         <td>${p.nombre}</td>
         <td>${p.medida}</td>
         <td>${p.stock}</td>

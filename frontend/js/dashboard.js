@@ -1,3 +1,5 @@
+const API_BASE = window.APP_CONFIG?.API_BASE_URL || "http://localhost:3000/api";
+
 document.addEventListener("DOMContentLoaded", () => {
 
   const token = localStorage.getItem("token");
@@ -23,7 +25,7 @@ async function loadDashboard() {
   try {
     const token = localStorage.getItem("token");
 
-    const res = await fetch("http://localhost:3000/api/productos", {
+    const res = await fetch(`${API_BASE}/productos`, {
       headers: {
         "Authorization": `Bearer ${token}`
       }

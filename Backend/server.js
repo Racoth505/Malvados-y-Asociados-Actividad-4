@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const path = require('path'); // ← corregido
+require('./env');
 
 app.use(cors());
 app.use(express.json());
@@ -28,6 +28,8 @@ app.put('/api/productos/:id', authMiddleware, productos.actualizar);
 // Errores
 app.use(errorHandler);
 
-app.listen(3000, () => {
-  console.log('Servidor corriendo en puerto 3000. http://localhost:3000/');
+const PORT = Number(process.env.PORT) || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en puerto ${PORT}. http://localhost:${PORT}/`);
 });

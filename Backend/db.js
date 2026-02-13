@@ -1,10 +1,12 @@
 const mysql = require('mysql2/promise');
+require('./env');
 
 const db = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '12345678',
-  database: 'stocko'
+  host: process.env.DB_HOST || '127.0.0.1',
+  port: Number(process.env.DB_PORT) || 3306,
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || 'Racoth6534-',
+  database: process.env.DB_NAME || 'stocko'
 });
 
 module.exports = db;

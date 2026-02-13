@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000/api";
+const API_URL = window.APP_CONFIG?.API_BASE_URL || "http://localhost:3000/api";
 
 const $ = (s) => document.querySelector(s);
 const errorMsg = $("#errorMsg");
@@ -69,7 +69,7 @@ $("#btnSignup").addEventListener("click", async () => {
   if (v) return showError(v);
 
   try {
-    const res = await fetch("http://localhost:3000/api/auth/register", {
+    const res = await fetch(`${API_URL}/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
